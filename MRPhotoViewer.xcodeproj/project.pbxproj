@@ -118,7 +118,8 @@
 		B351869A1FEED0D5001B7DF4 /* MRPhotoViewer */ = {
 			isa = PBXGroup;
 			children = (
-				B35186AD1FEED10F001B7DF4 /* New Group1 */,
+				B35186AE1FEED10F001B7DF4 /* ARKit Headset View */,
+				B35186FB1FEED385001B7DF4 /* Viewer.scn */,
 				B351869B1FEED0D5001B7DF4 /* AppDelegate.swift */,
 				B351869D1FEED0D5001B7DF4 /* ViewController.swift */,
 				B351869F1FEED0D5001B7DF4 /* Main.storyboard */,
@@ -127,15 +128,6 @@
 				B35186A71FEED0D5001B7DF4 /* Info.plist */,
 			);
 			path = MRPhotoViewer;
-			sourceTree = "<group>";
-		};
-		B35186AD1FEED10F001B7DF4 /* New Group1 */ = {
-			isa = PBXGroup;
-			children = (
-				B35186AE1FEED10F001B7DF4 /* ARKit Headset View */,
-				B35186FB1FEED385001B7DF4 /* Viewer.scn */,
-			);
-			path = "New Group1";
 			sourceTree = "<group>";
 		};
 		B35186AE1FEED10F001B7DF4 /* ARKit Headset View */ = {
