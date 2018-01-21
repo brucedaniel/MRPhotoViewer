@@ -5,7 +5,6 @@ import SceneKit
 import ARKit
 import Photos
 
-
 class ARVRViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
@@ -30,12 +29,6 @@ class ARVRViewController: UIViewController, ARSCNViewDelegate {
     let eyeFOV = 60; let cameraImageScale = 3.478; // Calculation based on iPhone7+ // <- Works ok for cheap mobile headsets. Rough guestimate.
     //    let eyeFOV = 90; let cameraImageScale = 6; // (Scale: 6 ± 1.0) Very Rough Guestimate.
     //    let eyeFOV = 120; let cameraImageScale = 8.756; // Rough Guestimate.
-    
-    var allPhotos: PHFetchResult<PHAsset>!
-    var smartAlbums: PHFetchResult<PHAssetCollection>!
-    var userCollections: PHFetchResult<PHCollection>!
-    let sectionLocalizedTitles = ["", NSLocalizedString("Smart Albums", comment: ""), NSLocalizedString("Albums", comment: "")]
-
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,13 +55,11 @@ class ARVRViewController: UIViewController, ARSCNViewDelegate {
         sceneViewLeft.scene = scene
         sceneViewLeft.showsStatistics = sceneView.showsStatistics
         sceneViewLeft.isPlaying = true
-//        self.leftShip = self.sceneViewLeft?.scene.rootNode.childNode(withName: "ship", recursively: true)
         
         // Set up Right-Eye SceneView
         sceneViewRight.scene = scene
         sceneViewRight.showsStatistics = sceneView.showsStatistics
         sceneViewRight.isPlaying = true
-//        self.rightShip = self.sceneViewRight?.scene.rootNode.childNode(withName: "ship", recursively: true)
         
         ////////////////////////////////////////////////////////////////
         // Create CAMERA
@@ -87,43 +78,30 @@ class ARVRViewController: UIViewController, ARSCNViewDelegate {
         self.imageViewLeft.contentMode = UIViewContentMode.center
         self.imageViewRight.clipsToBounds = true
         self.imageViewRight.contentMode = UIViewContentMode.center
+
+        let count = 40
+        let options = PHFetchOptions()
+        options.fetchLimit = count
+        let result = PHAsset.fetchAssets(with: .image, options: options)
+        print(result)
         
-//        PHPhotoLibrary.shared().unregisterChangeObserver(self)
-//
-//        let allPhotosOptions = PHFetchOptions()
-//        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-//        allPhotos = PHAsset.fetchAssets(with: allPhotosOptions)
-//        smartAlbums = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
-//        userCollections = PHCollectionList.fetchTopLevelUserCollections(with: nil)
-//
-//        PHPhotoLibrary.shared().register(self)
-        let enn = 40
-            for index in 0...enn {
-                //let newPlane = plane.clone()
-//                newPlane.geometry = geometry.copy() as? SCNGeometry
-                
-                let material = SCNMaterial()
-                material.diffuse.contents = UIImage(named: "IMG_0145.jpg")
-                material.specular.contents = UIColor.white
-//                newPlane.geometry?.firstMaterial = material
-//                geometry.firstMaterial = material
-//                newPlane.position = SCNVector3Make(newPlane.position.x, newPlane.position.y+ Float(index), newPlane.position.z)
-//                self.sceneView.scene.rootNode.addChildNode(newPlane)
-                let box = SCNBox(width: 0.0, height: 4.0, length: 6.0, chamferRadius: 0.0)
-//                let plane = SCNPlane(width: 1.0, height: 1.0)
-                let node = SCNNode(geometry: box)
-                
-                node.position = SCNVector3(0,0,4)
-                node.pivot = SCNMatrix4MakeTranslation(10.0, 10.0, 10.0)
-                node.eulerAngles = SCNVector3(Float(index) * 2 * Float.pi / Float(enn / 4),0.0, 0.0)
-                
-                node.geometry?.firstMaterial = material
-                scene.rootNode.addChildNode(node)
-                self.nodes.append(node)
-            }
+        result.enumerateObjects({ (asset, index, stop) -> Void in
+            let material = SCNMaterial()
+            material.diffuse.contents = self.getAssetThumbnail(asset: asset)
+            material.specular.contents = UIColor.white
+            let box = SCNBox(width: 0.0, height: 4.0, length: 6.0, chamferRadius: 0.0)
+            let node = SCNNode(geometry: box)
+            
+            node.position = SCNVector3(0,0,4)
+            node.pivot = SCNMatrix4MakeTranslation(10.0, 10.0, 10.0)
+            node.eulerAngles = SCNVector3(Float(index) * 2 * Float.pi / Float(count / 4),0.0, 0.0)
+            
+            node.geometry?.firstMaterial = material
+            scene.rootNode.addChildNode(node)
+            self.nodes.append(node)
+        })
         
         
-        //}
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -139,10 +117,6 @@ class ARVRViewController: UIViewController, ARSCNViewDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-//        self.sceneViewLeft.isHidden = true
-//        self.sceneViewRight.isHidden = true
-//        self.imageViewLeft.isHidden = true
-//        self.imageViewRight.isHidden = true
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -150,7 +124,7 @@ class ARVRViewController: UIViewController, ARSCNViewDelegate {
 
         // Pause the view's session
         sceneView.session.pause()
-         PHPhotoLibrary.shared().unregisterChangeObserver(self)
+//         PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
     
     override func didReceiveMemoryWarning() {
@@ -178,7 +152,7 @@ class ARVRViewController: UIViewController, ARSCNViewDelegate {
     }
     
     deinit {
-        PHPhotoLibrary.shared().unregisterChangeObserver(self)
+//        PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
     
     func updateFrame() {
@@ -245,11 +219,11 @@ class ARVRViewController: UIViewController, ARSCNViewDelegate {
         self.imageViewLeft.image = uiimage
         self.imageViewRight.image = uiimage
         
+        
+        
         if self.nodes.count > 0 {
             for index in 0...self.nodes.count-1 {
                 let node = self.nodes[index]
-                //Double(index) * 0.5
-                //Float(tick) * 0.01 +
                 node.position = SCNVector3(5, Double(index) * 0.5 , 0)
                 node.pivot = SCNMatrix4MakeTranslation(-10.0, 0.0, 0.0)
                 let rot =  Double(Float(tick) * 0.01 + Float(index) * 2 * Float.pi / Float(self.nodes.count / 4))
@@ -274,57 +248,3 @@ class ARVRViewController: UIViewController, ARSCNViewDelegate {
     }
 }
 
-
-extension ARVRViewController: PHPhotoLibraryChangeObserver {
-    
-    func photoLibraryDidChange(_ changeInstance: PHChange) {
-        // Change notifications may be made on a background queue. Re-dispatch to the
-        // main queue before acting on the change as we'll be updating the UI.
-        DispatchQueue.main.sync {
-            // Check each of the three top-level fetches for changes.
-            if let changeDetails = changeInstance.changeDetails(for: allPhotos) {
-                // Update the cached fetch result.
-                allPhotos = changeDetails.fetchResultAfterChanges
-                let num = 12
-                for count in 0...num {
-                    let obj = allPhotos.object(at: count)
-                    let image = self.getAssetThumbnail(asset: obj)
-                    print ("\(image)")
-                    
-                        //let newPlane = plane.clone()
-                        //                newPlane.geometry = geometry.copy() as? SCNGeometry
-                        
-                        let material = SCNMaterial()
-                        material.diffuse.contents = image
-                        material.specular.contents = UIColor.white
-                        //                newPlane.geometry?.firstMaterial = material
-                        //                geometry.firstMaterial = material
-                        //                newPlane.position = SCNVector3Make(newPlane.position.x, newPlane.position.y+ Float(index), newPlane.position.z)
-                        //                self.sceneView.scene.rootNode.addChildNode(newPlane)
-                        let box = SCNBox(width: 0.0, height: 4.0, length: 6.0, chamferRadius: 0.0)
-                        //                let plane = SCNPlane(width: 1.0, height: 1.0)
-                        let node = SCNNode(geometry: box)
-                        
-                        node.position = SCNVector3(0,0,0)
-                        node.pivot = SCNMatrix4MakeTranslation(10.0, 10.0, 10.0)
-                        node.eulerAngles = SCNVector3(Float(count) * 2 * Float.pi / Float(num),0.0, 0.0)
-                        
-                        node.geometry?.firstMaterial = material
-                        self.sceneView.scene.rootNode.addChildNode(node)
-                        self.nodes.append(node)
-                }
-                    
-                // (The table row for this one doesn't need updating, it always says "All Photos".)
-            }
-            
-            // Update the cached fetch results, and reload the table sections to match.
-            if let changeDetails = changeInstance.changeDetails(for: smartAlbums) {
-                smartAlbums = changeDetails.fetchResultAfterChanges
-            }
-            if let changeDetails = changeInstance.changeDetails(for: userCollections) {
-                userCollections = changeDetails.fetchResultAfterChanges
-            }
-            
-        }
-    }
-}
