@@ -224,7 +224,7 @@ class ARVRViewController: UIViewController, ARSCNViewDelegate {
         if self.nodes.count > 0 {
             for index in 0...self.nodes.count-1 {
                 let node = self.nodes[index]
-                node.position = SCNVector3(5, Double(index) * 0.5 , 0)
+                node.position = SCNVector3(5, Double(index) * 0.55 , 0)
                 node.pivot = SCNMatrix4MakeTranslation(-10.0, 0.0, 0.0)
                 let rot =  Double(Float(tick) * 0.01 + Float(index) * 2 * Float.pi / Float(self.nodes.count / 4))
                 
